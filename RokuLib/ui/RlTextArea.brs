@@ -9,9 +9,9 @@
 '@param spacing a Float specifying the distance between lines. E.g. 2.0 will result in double spaced lines
 '@param align a String specifing how text should be aligned. Choices are: left, center, right
 '@param return an RlTextArea object
-function RlTextArea(text as String, font as Object, rgba as Integer, x as Integer, y as Integer, width = 2000 as Integer, height = invalid as Dynamic, maxLines = 100 as Integer, spacing = 1.0 as Float, align = "left" as String) as Object
+function RlTextArea(text as String, font as Object, rgba as Integer, x as Integer, y as Integer, width = 2000 as Integer, height = invalid as Dynamic, maxLines = 100 as Integer, spacing = 1.0 as Float, align = "left" as String, useEllipses = false as Boolean) as Object
     this = {
-        type: "RlTextArea" 
+        type: "RlTextArea"
         text: text
         font: font
         rgba: rgba
@@ -22,21 +22,23 @@ function RlTextArea(text as String, font as Object, rgba as Integer, x as Intege
         maxLines: maxLines
         spacing: spacing
         align: align
-        
+
+        useEllipses: useEllipses
+
         Draw: RlTextArea_Draw
         Init: RlTextArea_Init
         Set: RlTextArea_Set
     }
-    
+
     this.Init() 'Initialize all lines in the RlTextArea
-    
+
     return this
 end function
 
 'Draws this RlTextArea object to the specified component
 '@param screen a roScreen/roBitmap/roRegion object
 '@return true if successful
-function RlTextArea_Draw(component as Object) as Boolean
+function RlTextArea_Draw(component as Object, color = &hFFFFFFFF as integer) as Boolean
     for each line in m.textLines
         if not line.Draw(component)
             return false
@@ -50,12 +52,12 @@ end function
 function RlTextArea_Init() as Void
     words = stringToWords(m.text)
     wordMax = words.Count() - 1
-    
+
     lines = []
-    
+
     ellipses = "..."
     ellipseWidth = m.font.GetOneLineWidth(ellipses, 9999)
-    
+
     tempHeight = 0
     for i = 0 to m.maxLines - 1
         'Check that we aren't exceeding the maximum height. Otherwise, simply exit the for loop
@@ -63,9 +65,9 @@ function RlTextArea_Init() as Void
         if m.height <> invalid and tempHeight > m.height
             exit for
         end if
-        
+
         lines[i] = ""
-       
+
         while words.Count() > 0 and GetFontWidth(m.font, words[0]) <= m.width - GetFontWidth(m.font, lines[i]) 'While a word can fit in the remaining width
             if i < m.maxLines - 1 'Not on last line, just put the word as long as it fits
             	if words[0] = "$n$" 'Special newline character
@@ -86,21 +88,24 @@ function RlTextArea_Init() as Void
                 end if
             end if
         end while
-        
+
         if i = m.maxLines - 1 and words.Count() > 0 'Remaining words left on last line, put ellipses
-            lines[i] = lines[i].Left(lines[i].Len() - 1) + ellipses
+            lines[i] = lines[i].Left(lines[i].Len() - 1)
+            if m.useEllipses = true
+              lines[i] = lines[i] + ellipses
+            end if
         end if
-        
+
         'Trim extra whitespace
         if lines[i].Left(lines[i].Len() - 1) = " "
         	lines[i] = lines[i].Left(lines[i].Len() - 2)
         end if
-        
+
         if words.Count() = 0
         	exit for
         end if
     end for
-    
+
     'Make Text elements for each line
     m.textLines = []
     max = lines.Count() - 1
@@ -113,10 +118,10 @@ function RlTextArea_Init() as Void
         else 'Default alignment is left
             tempX = m.x
         end if
-        
+
         m.textLines[i] = RlText(lines[i], m.font, m.rgba, tempX, m.y + i * m.spacing * GetFontHeight(m.font))
     end for
-    
+
     'If height is invalid, then use the actual height for the height
     if m.height = invalid
     	m.height = tempHeight
