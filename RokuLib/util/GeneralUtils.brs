@@ -1,5 +1,5 @@
 '**********************************************************
-'**  Video Player Example Application - General Utilities 
+'**  Video Player Example Application - General Utilities
 '**  November 2009
 '**  Copyright (c) 2009 Roku Inc. All Rights Reserved.
 '**********************************************************
@@ -525,17 +525,17 @@ End Sub
 'Print an object as a string for debugging. If it is
 'very long print the first 500 chars.
 '******************************************************
-Sub Dbg(pre As Dynamic, o=invalid As Dynamic)
-    p = AnyToString(pre)
-    if p = invalid p = ""
-    if o = invalid o = ""
-    s = AnyToString(o)
-    if s = invalid s = "???: " + type(o)
-    if Len(s) > 4000
-        s = Left(s, 4000)
-    end if
-    print p + s
-End Sub
+ Sub RokuLibDbg(pre As Dynamic, o=invalid As Dynamic)
+     p = AnyToString(pre)
+     if p = invalid p = ""
+     if o = invalid o = ""
+     s = AnyToString(o)
+     if s = invalid s = "???: " + type(o)
+     if Len(s) > 4000
+         s = Left(s, 4000)
+     end if
+     print p + s
+ End Sub
 
 
 '******************************************************
