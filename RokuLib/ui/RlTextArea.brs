@@ -9,7 +9,7 @@
 '@param spacing a Float specifying the distance between lines. E.g. 2.0 will result in double spaced lines
 '@param align a String specifing how text should be aligned. Choices are: left, center, right
 '@param return an RlTextArea object
-function RlTextArea(text as String, font as Object, rgba as Integer, x as Integer, y as Integer, width = 2000 as Integer, height = invalid as Dynamic, maxLines = 100 as Integer, spacing = 1.0 as Float, align = "left" as String, useEllipses = false as Boolean) as Object
+function RlTextArea(text as String, font as Object, rgba as Integer, x as Integer, y as Integer, width = 2000 as Integer, height = invalid as Dynamic, maxLines = 100 as Integer, spacing = 1.0 as Float, align = "left" as String, useEllipses = false as Boolean, useGrunge = false as Boolean) as Object
     this = {
         type: "RlTextArea"
         text: text
@@ -24,6 +24,7 @@ function RlTextArea(text as String, font as Object, rgba as Integer, x as Intege
         align: align
 
         useEllipses: useEllipses
+        useGrunge: useGrunge
 
         Draw: RlTextArea_Draw
         Init: RlTextArea_Init
@@ -118,8 +119,11 @@ function RlTextArea_Init() as Void
         else 'Default alignment is left
             tempX = m.x
         end if
-
-        m.textLines[i] = RlText(lines[i], m.font, m.rgba, tempX, m.y + i * m.spacing * GetFontHeight(m.font))
+        if m.useGrunge = true
+          m.textLines[i] = GrungeLabel(lines[i], m.font, m.rgba, tempX, m.y + i * m.spacing * GetFontHeight(m.font))
+        else
+          m.textLines[i] = RlText(lines[i], m.font, m.rgba, tempX, m.y + i * m.spacing * GetFontHeight(m.font))
+        end if
     end for
 
     'If height is invalid, then use the actual height for the height
